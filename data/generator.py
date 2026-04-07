@@ -103,7 +103,7 @@ def gen_dataset(n: int) -> pd.DataFrame:
     """
     Sinh n bản ghi sinh viên với student_id unique.
 
-    GPA range: [2.0, 4.0].
+    GPA range: [0.0, 4.0].
     student_id: lấy từ pool n số unique trong [0, 999999] → không trùng.
 
     Args:
@@ -120,7 +120,7 @@ def gen_dataset(n: int) -> pd.DataFrame:
         rows.append({
             "student_id":      sid,
             "name":            gen_name(),
-            "gpa":             round(random.uniform(2.0, 4.0), 2),  # [2.0, 4.0]
+            "gpa":             round(random.uniform(0.0, 4.0), 2),  # [0.0, 4.0]
             "department_code": random.choice(DEPARTMENT_CODES),
             **parse_cccd(sid),
         })

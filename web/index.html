@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Phân Tích Cấu Trúc Dữ Liệu & Giải Thuật</title>
+    <!-- Enterprise Fonts: Inter and JetBrains Mono -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Top Navigation -->
+        <header class="topbar">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group"></i>
+                <h1><span class="fw-bold">Hệ Thống</span> Quản Lý Sinh Viên</h1>
+            </div>
+            <div class="topbar-actions">
+                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> System Online</span>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <!-- Sidebar / Configuration Panel -->
+            <aside class="sidebar card">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h2>Nguồn Dữ Liệu</h2>
+                </div>
+                <p class="text-sm text-muted mb-4">Vui lòng chọn tập dữ liệu sinh viên để tải vào bộ nhớ hệ thống.</p>
+
+                <div class="dataset-options">
+                    <label class="ds-option">
+                        <input type="radio" name="dataset" value="1" checked>
+                        <div class="ds-card">
+                            <span class="ds-size">1,000 Bản ghi</span>
+                            <span class="ds-desc">Dữ liệu kiểm tra (Khởi động)</span>
+                        </div>
+                    </label>
+                    <label class="ds-option">
+                        <input type="radio" name="dataset" value="2">
+                        <div class="ds-card">
+                            <span class="ds-size">5,000 Bản ghi</span>
+                            <span class="ds-desc">Có sự chênh lệch hiệu năng</span>
+                        </div>
+                    </label>
+                    <label class="ds-option">
+                        <input type="radio" name="dataset" value="3">
+                        <div class="ds-card">
+                            <span class="ds-size">10,000 Bản ghi</span>
+                            <span class="ds-desc">Kiểm thử chịu tải (Stress Test)</span>
+                        </div>
+                    </label>
+                </div>
+
+                <button id="btn-load-dataset" class="btn btn-primary w-full mt-4">
+                    <i class="fa-solid fa-database"></i> Tải Dữ Liệu
+                </button>
+                <div id="dataset-status" class="status-msg mt-3 text-center"></div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="content-area disabled" id="scenario-section">
+                <div class="card p-0 mb-4 flex-col">
+                    <div class="step-header p-4 border-bottom">
+                        <span class="step-number">2</span>
+                        <h2>Kịch Bản Kiểm Định (Scenarios)</h2>
+                    </div>
+
+                    <div class="tabs-container border-bottom">
+                        <button class="tab-btn active" data-target="s1">
+                            Kịch Bản 1
+                            <span class="tab-sub">Tìm Cụ Thể (MSSV)</span>
+                        </button>
+                        <button class="tab-btn" data-target="s2">
+                            Kịch Bản 2
+                            <span class="tab-sub">Lọc Đa Điều Kiện</span>
+                        </button>
+                        <button class="tab-btn" data-target="s3">
+                            Kịch Bản 3
+                            <span class="tab-sub">Tìm Tên Gần Đúng</span>
+                        </button>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Scenario 1 -->
+                        <div id="s1" class="tab-pane active">
+                            <div class="control-group">
+                                <label for="s1-target-id" class="form-label">Mã Số Sinh Viên (MSSV)</label>
+                                <div class="input-icon">
+                                    <i class="fa-regular fa-id-badge"></i>
+                                    <input type="text" id="s1-target-id" class="form-input"
+                                        placeholder="Nhập MSSV ví dụ: SV001">
+                                </div>
+                            </div>
+
+                            <h4 class="section-title mt-4">Thực thi Thuật toán:</h4>
+                            <div class="algo-grid">
+                                <button class="btn-algo" data-algo="chain">
+                                    <div class="algo-icon"><i class="fa-solid fa-link"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Bảng Băm (Chaining)</div>
+                                        <div class="algo-result" id="res-s1-chain">Chưa chạy</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="open">
+                                    <div class="algo-icon"><i class="fa-solid fa-bullseye"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Bảng Băm (Open Addr)</div>
+                                        <div class="algo-result" id="res-s1-open">Chưa chạy</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="linear">
+                                    <div class="algo-icon"><i class="fa-solid fa-bars-staggered"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Tìm kiếm Tuần tự</div>
+                                        <div class="algo-result" id="res-s1-linear">Chưa chạy</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="binary">
+                                    <div class="algo-icon"><i class="fa-solid fa-code-branch"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Tìm kiếm Nhị phân</div>
+                                        <div class="algo-result" id="res-s1-binary">Chưa chạy</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 2 -->
+                        <div id="s2" class="tab-pane">
+                            <div class="radio-group mb-4">
+                                <label class="radio-control">
+                                    <input type="radio" name="s2_type" value="2A" checked>
+                                    <span class="radio-label">2A. Lọc theo Khoa + Khoảng GPA (Hash có lợi thế)</span>
+                                </label>
+                                <label class="radio-control">
+                                    <input type="radio" name="s2_type" value="2B">
+                                    <span class="radio-label">2B. Lọc chỉ theo Khoảng GPA (Hash thất bại)</span>
+                                </label>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="control-group" id="dept-group">
+                                    <label class="form-label">Khoa</label>
+                                    <select id="s2-dept" class="form-input">
+                                        <option value="CNTT">Công Nghệ Thông Tin</option>
+                                        <option value="KHDL">Khoa Học Dữ Liệu</option>
+                                        <option value="HTTT">Hệ Thống Thông Tin</option>
+                                        <option value="ATTT">An Toàn Thông Tin</option>
+                                        <option value="KHMT">Khoa Học Máy Tính</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label class="form-label">GPA Tối Thiểu</label>
+                                    <input type="number" id="s2-min-gpa" class="form-input text-right" step="0.1"
+                                        value="3.0">
+                                </div>
+                                <div class="control-group">
+                                    <label class="form-label">GPA Tối Đa</label>
+                                    <input type="number" id="s2-max-gpa" class="form-input text-right" step="0.1"
+                                        value="4.0">
+                                </div>
+                            </div>
+
+                            <h4 class="section-title mt-4">Thực thi Thuật toán:</h4>
+                            <div class="algo-grid cols-3">
+                                <button class="btn-algo" data-algo="hash">
+                                    <div class="algo-icon"><i class="fa-solid fa-network-wired"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Composite Hash</div>
+                                        <div class="algo-result" id="res-s2-hash">Chưa chạy</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="linear">
+                                    <div class="algo-icon"><i class="fa-solid fa-bars-progress"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Linear Scan</div>
+                                        <div class="algo-result" id="res-s2-linear">Chưa chạy</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="binary">
+                                    <div class="algo-icon"><i class="fa-solid fa-filter"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Binary Filter</div>
+                                        <div class="algo-result" id="res-s2-binary">Chưa chạy</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Scenario 3 -->
+                        <div id="s3" class="tab-pane">
+                            <div class="control-group mb-4">
+                                <label class="form-label">Truy vấn Tên Sinh Viên (Tìm Mờ)</label>
+                                <div class="input-icon">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="s3-query" class="form-input" value="Văn An">
+                                </div>
+                            </div>
+
+                            <h4 class="section-title">Thực thi Thuật toán:</h4>
+                            <div class="algo-grid">
+                                <button class="btn-algo disabled-algo" data-algo="hash">
+                                    <div class="algo-icon text-danger"><i class="fa-solid fa-ban"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name text-danger">Tra cứu Hash</div>
+                                        <div class="algo-result" id="res-s3-hash">(Không hỗ trợ)</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="fuzzy">
+                                    <div class="algo-icon"><i class="fa-solid fa-text-width"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Quét Mờ Tuần Tự</div>
+                                        <div class="algo-result" id="res-s3-fuzzy">Chưa chạy</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DEDICATED RESULT AREA FOR THE UI -->
+                    <div id="ui-result-area" class="p-4"
+                        style="display: none; background-color: #f8fafc; border-top: 1px solid var(--border-color); border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
+                        <h4 class="section-title text-primary"><i class="fa-solid fa-clipboard-check"></i> Chi tiết Kết
+                            quả</h4>
+                        <div id="ui-result-content"></div>
+                    </div>
+                </div>
+
+                <!-- Console Output Area -->
+                <div class="card p-0 terminal-card">
+                    <div class="terminal-header">
+                        <div class="term-title"><i class="fa-solid fa-terminal"></i> Bảng Điều Khiển Hệ Thống</div>
+                        <button id="clear-output" class="btn btn-icon btn-sm text-muted" title="Xóa dữ liệu màn hình"><i
+                                class="fa-solid fa-eraser"></i></button>
+                    </div>
+                    <div class="terminal" id="terminal-output">
+                        <div class="term-line"><span class="sys">[System]</span> Hệ thống sẵn sàng. Vui lòng tải dữ liệu
+                            môi trường để bắt đầu.</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
