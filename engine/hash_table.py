@@ -36,4 +36,3 @@ class HashTable:
     def search(self, key: str):
         raise NotImplementedError
 
-    # ---- Thông tin trạng thái ----
