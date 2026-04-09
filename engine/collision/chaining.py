@@ -60,11 +60,3 @@ class ChainingHashTable(HashTable):
         return None   # không tìm thấy
 
 
-    # ---- debug helper ----
-
-    def chain_lengths(self) -> list[int]:
-        """
-        Trả về danh sách độ dài của từng chain.
-        Dùng để visualize phân bố collision — bucket nào bị quá tải.
-        """
-        return [len(chain) for chain in self.table if len(chain) > 0]

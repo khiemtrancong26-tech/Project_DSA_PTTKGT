@@ -78,26 +78,3 @@ class OpenAddressingHashTable(HashTable):
 
         return None   # đã probe hết vòng
 
-    # ---- debug helper ----
-
-    def probe_length(self, key: str) -> int:
-        """
-        Đếm số bước probe cần thiết để tìm key.
-        Dùng để visualize clustering khi α tăng cao.
-        """
-        idx = self._hash(key)
-        steps = 0
-
-        for _ in range(self.size):
-            slot = self.table[idx]
-            steps += 1
-
-            if slot is None:
-                return steps   # không tìm thấy nhưng vẫn trả về số bước
-
-            if slot[0] == key:
-                return steps
-
-            idx = (idx + 1) % self.size
-
-        return steps
