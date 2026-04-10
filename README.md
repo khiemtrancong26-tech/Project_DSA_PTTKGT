@@ -1,14 +1,15 @@
-# Project_DSA_PTTKGT — Hệ Thống Quản Lý Sinh Viên
+# HashIndex — Hệ Thống So Sánh Thuật Toán Tìm Kiếm
 
-So sánh hiệu năng các thuật toán tìm kiếm (Hash Table, Linear Search, Binary Search) trên dataset sinh viên giả lập.
+So sánh hiệu năng **Hash Table, Linear Search, Binary Search** trên dataset sinh viên giả lập, qua 3 scenario thực tế.
 
 ## Tính năng
 
-- **Scenario 1:** Tra cứu sinh viên theo MSSV
-- **Scenario 2:** Lọc theo GPA và mã khoa
-- **Scenario 3:** Tìm kiếm tên mờ (fuzzy search)
-- Dataset: 1K / 5K / 10K records sinh viên
-- **Hai giao diện:** Terminal (CLI) và Web UI chạy local
+- **Scenario 1:** Tra cứu sinh viên theo MSSV → Hash wins
+- **Scenario 2A:** Lọc theo GPA + mã khoa → Composite Hash (ChainingMulti) wins
+- **Scenario 2B:** Lọc theo khoảng GPA thuần → Hash FAILED, Binary wins
+- **Scenario 3:** Tìm kiếm tên mờ (fuzzy, bỏ dấu tiếng Việt) → Hash FAILED hoàn toàn
+- Dataset: 1K / 5K / 10K records sinh viên giả lập
+- **Hai giao diện:** Terminal CLI (rich) và Web UI (FastAPI + HTML/JS)
 
 ## Cài đặt
 
@@ -46,14 +47,15 @@ pip install -r requirements.txt
 ```bash
 python data/generator.py
 ```
+Tạo 3 file `students_1K.xlsx`, `students_5K.xlsx`, `students_10K.xlsx` trong thư mục `data/`.
 
 ---
 
-### Giao diện 1 — Terminal (CLI)
+### Giao diện 1 — Terminal CLI
 ```bash
 python main.py
 ```
-Giao diện dòng lệnh với rich terminal, chọn scenario và thuật toán bằng phím số.
+Chọn dataset size → chọn scenario → chọn thuật toán → xem kết quả và thời gian thực thi.
 
 ---
 
@@ -61,7 +63,7 @@ Giao diện dòng lệnh với rich terminal, chọn scenario và thuật toán 
 ```bash
 python web.py
 ```
-Sau đó mở trình duyệt và truy cập:
+Mở trình duyệt và truy cập:
 ```
 http://localhost:8000
 ```
@@ -70,40 +72,54 @@ http://localhost:8000
 - Chọn dataset và load bằng nút bấm
 - Chạy từng thuật toán, xem thời gian thực thi ngay trên giao diện
 - Scenario 2 & 3: hiển thị toàn bộ kết quả dưới dạng bảng có thể cuộn
-- Bảng điều khiển hệ thống (terminal log) theo dõi từng thao tác
+- Terminal log theo dõi từng thao tác
 
 > Web UI chỉ chạy local (`localhost`) — không cần HTTPS, không expose ra ngoài internet.
 
 ## Cấu trúc project
+
 ```
 Project_DSA_PTTKGT/
 ├── data/
-│   ├── generator.py      # Sinh dataset giả
-│   └── loader.py         # Đọc file xlsx, build hash tables
+│   ├── generator.py          # Sinh dataset giả (CCCD-based student_id)
+│   └── loader.py             # Đọc xlsx, build hash tables, sample_id
 ├── engine/
-│   ├── hash_table.py     # Base class Hash Table
-│   ├── benchmark.py      # Đo thời gian thực thi
-│   ├── search.py         # Linear & Binary Search
-│   ├── fuzzy_search.py   # Tìm kiếm tên mờ
+│   ├── fuzzy_search.py       # Fuzzy search — NFKD normalize bỏ dấu tiếng Việt
+│   ├── benchmark.py          # Đo thời gian avg 20 lần (perf_counter)
+│   ├── search.py             # Linear Search, Binary Search, bisect filter, sort helpers
+│   ├── hash_table.py         # Base class — Polynomial Rolling Hash
 │   └── collision/
-│       ├── chaining.py         # Hash Chaining
-│       └── open_addressing.py  # Open Addressing
+│       ├── chaining.py       # Separate Chaining — 1 key → 1 value (dùng S1)
+│       ├── chaining_multi.py # Chaining Multi — 1 key → nhiều value (dùng S2A)
+│       └── open_addressing.py# Linear Probing (dùng S1)
 ├── interface/
-│   ├── cli.py            # Giao diện dòng lệnh
-│   └── display.py        # Render kết quả ra terminal
+│   ├── cli.py                # Giao diện dòng lệnh — luồng chính
+│   └── display.py            # Render kết quả ra terminal (rich)
 ├── web/
-│   ├── index.html        # Giao diện Web UI
-│   ├── script.js         # Logic frontend
-│   └── style.css         # Stylesheet
-├── web.py                # FastAPI server — chạy Web UI
-├── main.py               # Entry point CLI
+│   ├── index.html            # Giao diện Web UI
+│   ├── script.js             # Logic frontend
+│   └── style.css             # Stylesheet
+├── web.py                    # FastAPI server — serve Web UI + REST API
+├── main.py                   # Entry point CLI
 └── requirements.txt
 ```
+
+## Thiết kế engine
+
+| Module | Vai trò |
+|--------|---------|
+| `hash_table.py` | Base class — định nghĩa `_hash()` (Polynomial Rolling Hash), interface `insert`/`search` |
+| `chaining.py` | Separate Chaining — 1 key → 1 value, upsert khi key trùng |
+| `chaining_multi.py` | Chaining Multi — 1 key → list value, dùng cho Scenario 2A (key = department_code) |
+| `open_addressing.py` | Linear Probing — toàn bộ data trong 1 mảng phẳng, α < 1 |
+| `search.py` | Linear/Binary Search + bisect filter + sort helpers — thuần thuật toán, không đo thời gian |
+| `fuzzy_search.py` | NFKD decompose → bỏ combining diacritics → substring match không phân biệt dấu |
+| `benchmark.py` | Đo avg 20 lần bằng `perf_counter()`, cache department index theo `id(records)` |
 
 ## Công nghệ sử dụng
 
 - Python 3.11
-- pandas, openpyxl — xử lý dữ liệu
+- pandas, openpyxl — đọc/ghi xlsx
 - rich — giao diện terminal
 - FastAPI, uvicorn — Web UI server
 - HTML / CSS / JavaScript — frontend
