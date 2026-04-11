@@ -4,7 +4,7 @@ Layer 1 — chuẩn bị dữ liệu cho engine.
 
 Gồm 3 nhóm chức năng:
     1. load_xlsx         — đọc file xlsx, trả về list[dict]
-    2. build_hash_tables — khởi tạo Chaining và Open Addressing từ records
+    2. build_hash_tables — khởi tạo Chaining, Open Addressing và Dept Index từ records
     3. sample_id         — lấy student_id mẫu để benchmark reproducible
 
 Schema đọc ra — 7 cột:
@@ -42,7 +42,7 @@ def load_xlsx(filepath: str | Path) -> list:
         engine="openpyxl",
     )
 
-    _validate_columns(df, path)
+    _validate_columns(df, path)  # check đọc đủ các cột trong file xlsx
 
     df["gpa"]        = df["gpa"].astype(float).round(2)
     df["birth_year"] = df["birth_year"].astype(int)
@@ -50,6 +50,7 @@ def load_xlsx(filepath: str | Path) -> list:
     return df.to_dict(orient="records")
 
 
+# Hàm check đọc đủ các cột trong file xlsx:
 def _validate_columns(df: "pd.DataFrame", path: Path):
     required = {
         "student_id", "name", "gpa",
@@ -69,19 +70,25 @@ def _validate_columns(df: "pd.DataFrame", path: Path):
 def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
     from engine.collision.chaining        import ChainingHashTable
     from engine.collision.open_addressing import OpenAddressingHashTable
+    from engine.collision.chaining_multi  import ChainingMultiHashTable
 
+    # S1 — hash theo student_id
     size     = _next_prime(int(len(records) / load_factor))
     ht_chain = ChainingHashTable(size=size)
     ht_open  = OpenAddressingHashTable(size=size)
 
+    # S2A — hash theo department_code (5 khoa cố định → size nhỏ)
+    ht_dept  = ChainingMultiHashTable(size=11)
+
     for r in records:
-        key = r["student_id"]
-        ht_chain.insert(key, r)
-        ht_open.insert(key, r)
+        ht_chain.insert(r["student_id"], r)
+        ht_open.insert(r["student_id"], r)
+        ht_dept.insert(r["department_code"], r)
 
-    return ht_chain, ht_open
+    return ht_chain, ht_open, ht_dept
 
 
+# Hàm lấy số nguyên tố gần nhất:
 def _next_prime(n: int) -> int:
     def is_prime(x):
         if x < 2:
@@ -97,7 +104,7 @@ def _next_prime(n: int) -> int:
 
 
 # ══════════════════════════════════════════════════════════════════
-#  3. Tiện ích benchmark
+#  3. Tiện ích benchmark (lấy student_id default)
 # ══════════════════════════════════════════════════════════════════
 
 def sample_id(records: list, index: int = 500) -> str:

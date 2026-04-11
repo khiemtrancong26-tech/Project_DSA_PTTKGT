@@ -6,7 +6,7 @@ So sánh hiệu năng **Hash Table, Linear Search, Binary Search** trên dataset
 
 - **Scenario 1:** Tra cứu sinh viên theo MSSV → Hash wins
 - **Scenario 2A:** Lọc theo GPA + mã khoa → Composite Hash (ChainingMulti) wins
-- **Scenario 2B:** Lọc theo khoảng GPA thuần → Hash FAILED, Binary wins
+- **Scenario 2B:** Lọc theo khoảng GPA thuần → Hash FAILED
 - **Scenario 3:** Tìm kiếm tên mờ (fuzzy, bỏ dấu tiếng Việt) → Hash FAILED hoàn toàn
 - Dataset: 1K / 5K / 10K records sinh viên giả lập
 - **Hai giao diện:** Terminal CLI (rich) và Web UI (FastAPI + HTML/JS)

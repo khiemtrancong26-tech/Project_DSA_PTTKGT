@@ -10,11 +10,6 @@ Nguyên tắc đo:
 
 Mỗi hàm trả về dict chuẩn để frontend render —
 không có bất kỳ logic in ấn nào ở đây (Separation of Concerns).
-
-Cache department index:
-    Composite Hash (S2A) dùng ChainingMultiHashTable — key là department_code.
-    Build lại mỗi lần gọi = lãng phí + làm sai lệch ý nghĩa benchmark.
-    Cache key = id(records) — list mới → tự động build lại.
 """
 
 import time
@@ -30,10 +25,9 @@ from engine.search import (
     sort_by_gpa,
 )
 from engine.fuzzy_search import fuzzy_linear_search
-from engine.collision.chaining_multi import ChainingMultiHashTable
 
 
-REPEAT = 20
+REPEAT = 10
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -49,27 +43,6 @@ def _avg_ms(fn, repeat: int = REPEAT) -> tuple:
         result = fn()
         total += time.perf_counter() - start
     return (total / repeat) * 1000, result
-
-
-_dept_index_cache = {"records_id": None, "index": None}
-
-
-def _get_dept_index(records: list) -> ChainingMultiHashTable:
-    """
-    Trả về ChainingMultiHashTable — key = department_code, value = list records.
-    Build 1 lần, cache lại. List mới → tự động build lại.
-    """
-    if _dept_index_cache["records_id"] == id(records):
-        return _dept_index_cache["index"]
-
-    # 5 khoa cố định → size nhỏ, dùng số nguyên tố gần 10
-    ht = ChainingMultiHashTable(size=11)
-    for r in records:
-        ht.insert(r["department_code"], r)
-
-    _dept_index_cache["records_id"] = id(records)
-    _dept_index_cache["index"]      = ht
-    return ht
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -104,9 +77,7 @@ def bench_s1_binary(records: list, target_id: str) -> dict:
 #  SCENARIO 2A — Lọc GPA + Department
 # ══════════════════════════════════════════════════════════════════
 
-def bench_s2a_hash(records: list, department: str, min_gpa: float, max_gpa: float) -> dict:
-    ht_dept = _get_dept_index(records)
-
+def bench_s2a_hash(ht_dept, department: str, min_gpa: float, max_gpa: float) -> dict:
     def _filter():
         bucket = ht_dept.search(department)  # trả về list record của khoa đó
         return [r for r in bucket if min_gpa <= r["gpa"] <= max_gpa]

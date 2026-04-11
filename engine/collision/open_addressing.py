@@ -13,11 +13,6 @@ class OpenAddressingHashTable(HashTable):
     Complexity:
         insert : O(1) avg / O(n) worst
         search : O(1) avg / O(n) worst
-
-    Giới hạn load factor:
-        Open Addressing bắt buộc α < 1 (không thể có nhiều phần tử hơn slot).
-        α > 0.7 → probe length tăng mạnh → hiệu năng giảm rõ rệt.
-        Thực tế nên giữ α ≤ 0.6 cho Linear Probing.
     """
 
     def __init__(self, size: int = 1009):

@@ -34,9 +34,10 @@ DATASET_FILES = {
 
 # State
 db = {
-    "records": [],
+    "records":  [],
     "ht_chain": None,
-    "ht_open": None
+    "ht_open":  None,
+    "ht_dept":  None,
 }
 
 class LoadDatasetReq(BaseModel):
@@ -47,16 +48,16 @@ def api_load_dataset(req: LoadDatasetReq):
     size = req.size
     if size not in DATASET_FILES:
         raise HTTPException(status_code=400, detail="Invalid dataset size")
-        
+
     records = load_xlsx(DATASET_FILES[size])
-    ht_chain, ht_open = build_hash_tables(records, load_factor=0.5)
-    
-    db["records"] = records
+    ht_chain, ht_open, ht_dept = build_hash_tables(records, load_factor=0.5)
+
+    db["records"]  = records
     db["ht_chain"] = ht_chain
-    db["ht_open"] = ht_open
-    
+    db["ht_open"]  = ht_open
+    db["ht_dept"]  = ht_dept
+
     suggested = sample_id(records) if len(records) > 0 else "SV001"
-    
     return {"count": len(records), "suggested_id": suggested}
 
 class Scenario1Req(BaseModel):
@@ -67,7 +68,7 @@ class Scenario1Req(BaseModel):
 def api_scenario1(req: Scenario1Req):
     if not db["records"]:
         raise HTTPException(status_code=400, detail="Load dataset first")
-        
+
     if req.algo == "chain":
         return bench_s1_chain(db["ht_chain"], req.target_id)
     elif req.algo == "open":
@@ -90,10 +91,10 @@ class Scenario2Req(BaseModel):
 def api_scenario2(req: Scenario2Req):
     if not db["records"]:
         raise HTTPException(status_code=400, detail="Load dataset first")
-        
+
     if req.scenario == "2A":
         if req.algo == "hash":
-            return bench_s2a_hash(db["records"], req.department, req.min_gpa, req.max_gpa)
+            return bench_s2a_hash(db["ht_dept"], req.department, req.min_gpa, req.max_gpa)
         elif req.algo == "linear":
             return bench_s2a_linear(db["records"], req.department, req.min_gpa, req.max_gpa)
         elif req.algo == "binary":
@@ -115,7 +116,7 @@ class Scenario3Req(BaseModel):
 def api_scenario3(req: Scenario3Req):
     if not db["records"]:
         raise HTTPException(status_code=400, detail="Load dataset first")
-        
+
     if req.algo == "hash":
         return bench_s3_hash(db["ht_chain"], req.query)
     elif req.algo == "fuzzy":

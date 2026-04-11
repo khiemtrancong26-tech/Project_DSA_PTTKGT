@@ -13,9 +13,6 @@ class ChainingHashTable(HashTable):
     Complexity:
         insert : O(1) avg — append vào đầu list
         search : O(1) avg / O(n) worst — duyệt list trong bucket
-
-    Worst case xảy ra khi tất cả key hash về cùng 1 bucket (α → ∞).
-    Với load factor α ≤ 0.7, chain trung bình ≈ 1–2 phần tử → gần O(1).
     """
 
     def __init__(self, size: int = 1009):
