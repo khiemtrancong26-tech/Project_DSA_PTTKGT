@@ -454,6 +454,10 @@ body {
     grid-template-columns: repeat(3, 1fr);
 }
 
+.algo-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
 .btn-algo {
     display: flex;
     align-items: center;

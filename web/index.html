@@ -5,12 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Phân Tích Cấu Trúc Dữ Liệu & Giải Thuật</title>
-    <!-- Enterprise Fonts: Inter and JetBrains Mono -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 
 <body>
@@ -170,12 +169,19 @@
                             </div>
 
                             <h4 class="section-title mt-4">Thực thi Thuật toán:</h4>
-                            <div class="algo-grid cols-3">
-                                <button class="btn-algo" data-algo="hash">
-                                    <div class="algo-icon"><i class="fa-solid fa-network-wired"></i></div>
+                            <div class="algo-grid cols-4">
+                                <button class="btn-algo" data-algo="chain">
+                                    <div class="algo-icon"><i class="fa-solid fa-link"></i></div>
                                     <div class="algo-details">
-                                        <div class="algo-name">Composite Hash</div>
-                                        <div class="algo-result" id="res-s2-hash">Chưa chạy</div>
+                                        <div class="algo-name">Hash Chaining</div>
+                                        <div class="algo-result" id="res-s2-chain">Chưa chạy</div>
+                                    </div>
+                                </button>
+                                <button class="btn-algo" data-algo="open">
+                                    <div class="algo-icon"><i class="fa-solid fa-bullseye"></i></div>
+                                    <div class="algo-details">
+                                        <div class="algo-name">Hash Open Addr.</div>
+                                        <div class="algo-result" id="res-s2-open">Chưa chạy</div>
                                     </div>
                                 </button>
                                 <button class="btn-algo" data-algo="linear">
@@ -251,7 +257,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/static/script.js"></script>
+    <script src="/static/script.js?v=2"></script>
 </body>
 
 </html>

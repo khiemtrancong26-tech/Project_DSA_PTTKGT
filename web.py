@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from data.loader import load_xlsx, build_hash_tables, sample_id
 from engine.benchmark import (
     bench_s1_chain, bench_s1_open, bench_s1_linear, bench_s1_binary,
-    bench_s2a_hash, bench_s2a_linear, bench_s2a_binary,
+    bench_s2a_chain, bench_s2a_open, bench_s2a_linear, bench_s2a_binary,
     bench_s2b_hash, bench_s2b_linear, bench_s2b_binary,
     bench_s3_hash, bench_s3_fuzzy,
 )
@@ -23,7 +23,10 @@ app.mount("/static", StaticFiles(directory="web"), name="static")
 
 @app.get("/")
 def read_root():
-    return FileResponse("web/index.html")
+    response = FileResponse("web/index.html")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 DATA_DIR = Path("data")
 DATASET_FILES = {
@@ -34,10 +37,11 @@ DATASET_FILES = {
 
 # State
 db = {
-    "records":  [],
-    "ht_chain": None,
-    "ht_open":  None,
-    "ht_dept":  None,
+    "records":       [],
+    "ht_chain":      None,
+    "ht_open":       None,
+    "ht_chain_dept": None,
+    "ht_open_dept":  None,
 }
 
 class LoadDatasetReq(BaseModel):
@@ -50,12 +54,13 @@ def api_load_dataset(req: LoadDatasetReq):
         raise HTTPException(status_code=400, detail="Invalid dataset size")
 
     records = load_xlsx(DATASET_FILES[size])
-    ht_chain, ht_open, ht_dept = build_hash_tables(records)
+    ht_chain, ht_open, ht_chain_dept, ht_open_dept = build_hash_tables(records)
 
-    db["records"]  = records
-    db["ht_chain"] = ht_chain
-    db["ht_open"]  = ht_open
-    db["ht_dept"]  = ht_dept
+    db["records"]       = records
+    db["ht_chain"]      = ht_chain
+    db["ht_open"]       = ht_open
+    db["ht_chain_dept"] = ht_chain_dept
+    db["ht_open_dept"]  = ht_open_dept
 
     suggested = sample_id(records) if len(records) > 0 else "SV001"
     return {"count": len(records), "suggested_id": suggested}
@@ -93,19 +98,24 @@ def api_scenario2(req: Scenario2Req):
         raise HTTPException(status_code=400, detail="Load dataset first")
 
     if req.scenario == "2A":
-        if req.algo == "hash":
-            return bench_s2a_hash(db["ht_dept"], req.department, req.min_gpa, req.max_gpa)
+        if req.algo == "chain":
+            return bench_s2a_chain(db["ht_chain_dept"], req.department, req.min_gpa, req.max_gpa)
+        elif req.algo == "open":
+            return bench_s2a_open(db["ht_open_dept"], req.department, req.min_gpa, req.max_gpa)
         elif req.algo == "linear":
             return bench_s2a_linear(db["records"], req.department, req.min_gpa, req.max_gpa)
         elif req.algo == "binary":
             return bench_s2a_binary(db["records"], req.department, req.min_gpa, req.max_gpa)
+
     elif req.scenario == "2B":
-        if req.algo == "hash":
-            return bench_s2b_hash(req.min_gpa, req.max_gpa)
+        if req.algo in ("chain", "open", "hash"):
+            return {"algo": "Hash lookup", "ms": None, "sort_ms": None,
+                    "match_count": 0, "matches": [], "failed": True}
         elif req.algo == "linear":
             return bench_s2b_linear(db["records"], req.min_gpa, req.max_gpa)
         elif req.algo == "binary":
             return bench_s2b_binary(db["records"], req.min_gpa, req.max_gpa)
+
     raise HTTPException(status_code=400, detail="Invalid config")
 
 class Scenario3Req(BaseModel):

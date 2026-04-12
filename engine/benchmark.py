@@ -27,7 +27,7 @@ from engine.search import (
 from engine.fuzzy_search import fuzzy_linear_search
 
 
-REPEAT = 50
+REPEAT = 10
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -77,13 +77,21 @@ def bench_s1_binary(records: list, target_id: str) -> dict:
 #  SCENARIO 2A — Lọc GPA + Department
 # ══════════════════════════════════════════════════════════════════
 
-def bench_s2a_hash(ht_dept, department: str, min_gpa: float, max_gpa: float) -> dict:
+def bench_s2a_chain(ht_chain_dept, department: str, min_gpa: float, max_gpa: float) -> dict:
     def _filter():
-        bucket = ht_dept.search(department)  # trả về list record của khoa đó
+        bucket = ht_chain_dept.search(department)
         return [r for r in bucket if min_gpa <= r["gpa"] <= max_gpa]
 
     ms, matches = _avg_ms(_filter)
-    return {"algo": "Composite Hash", "ms": ms, "sort_ms": None, "match_count": len(matches), "matches": matches, "failed": False}
+    return {"algo": "Hash Chaining", "ms": ms, "sort_ms": None, "match_count": len(matches), "matches": matches, "failed": False}
+
+def bench_s2a_open(ht_open_dept, department: str, min_gpa: float, max_gpa: float) -> dict:
+    def _filter():
+        bucket = ht_open_dept.search(department)
+        return [r for r in bucket if min_gpa <= r["gpa"] <= max_gpa]
+
+    ms, matches = _avg_ms(_filter)
+    return {"algo": "Open Addr. Hash", "ms": ms, "sort_ms": None, "match_count": len(matches), "matches": matches, "failed": False}
 
 
 def bench_s2a_linear(records: list, department: str, min_gpa: float, max_gpa: float) -> dict:

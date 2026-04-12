@@ -70,7 +70,6 @@ dom.btnLoadDb.addEventListener('click', async () => {
         dom.secScenario.classList.remove('disabled');
         dom.dbStatus.innerHTML = `<span class="text-success"><i class="fa-solid fa-check"></i> Tải thành công ${data.count.toLocaleString()} dòng</span>`;
 
-        // Ẩn kết quả cũ khi load dataset mới
         document.getElementById('ui-result-area').style.display = 'none';
 
     } catch (err) {
@@ -99,12 +98,11 @@ dom.tabBtns.forEach(btn => {
 dom.s2RadioLabels.forEach(radio => {
     radio.addEventListener('change', (e) => {
         state.scenarioType = e.target.value;
+
         if (state.scenarioType === '2A') {
             dom.s2DeptGroup.style.display = 'flex';
-            document.querySelector('#s2 .btn-algo[data-algo="hash"] .algo-name').textContent = 'Composite Hash';
         } else {
             dom.s2DeptGroup.style.display = 'none';
-            document.querySelector('#s2 .btn-algo[data-algo="hash"] .algo-name').textContent = 'Hash (Không hỗ trợ)';
         }
     });
 });
