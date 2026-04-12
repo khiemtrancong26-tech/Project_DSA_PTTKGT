@@ -68,23 +68,13 @@ def linear_filter_gpa(records: list, min_gpa: float, max_gpa: float) -> list:
     return [r for r in records if min_gpa <= r["gpa"] <= max_gpa]
 
 
-def binary_filter_dept_gpa(sorted_by_gpa: list, department: str, min_gpa: float, max_gpa: float) -> list:
-    """
-    Dùng bisect tìm khoảng [min_gpa, max_gpa] trên list ĐÃ SORT theo GPA,
-    sau đó lọc thêm theo department. Complexity: O(log n + k).
-    """
-    gpa_keys = [r["gpa"] for r in sorted_by_gpa]
+def binary_filter_dept_gpa(sorted_by_gpa: list, gpa_keys: list, department: str, min_gpa: float, max_gpa: float) -> list:
     lo = bisect.bisect_left(gpa_keys, min_gpa)
     hi = bisect.bisect_right(gpa_keys, max_gpa)
     return [r for r in sorted_by_gpa[lo:hi] if r["department_code"] == department]
 
 
-def binary_filter_gpa(sorted_by_gpa: list, min_gpa: float, max_gpa: float) -> list:
-    """
-    Dùng bisect tìm khoảng [min_gpa, max_gpa] trên list ĐÃ SORT theo GPA.
-    Complexity: O(log n + k).
-    """
-    gpa_keys = [r["gpa"] for r in sorted_by_gpa]
+def binary_filter_gpa(sorted_by_gpa: list, gpa_keys: list, min_gpa: float, max_gpa: float) -> list:
     lo = bisect.bisect_left(gpa_keys, min_gpa)
     hi = bisect.bisect_right(gpa_keys, max_gpa)
     return sorted_by_gpa[lo:hi]
@@ -99,6 +89,7 @@ def sort_by_id(records: list) -> list:
     return sorted(records, key=lambda r: r["student_id"])
 
 
-def sort_by_gpa(records: list) -> list:
-    """Sắp xếp theo GPA tăng dần — chuẩn bị cho Binary Filter. O(n log n)."""
-    return sorted(records, key=lambda r: r["gpa"])
+def sort_by_gpa(records: list) -> tuple:
+    """Sắp xếp theo GPA, trả về (sorted_records, gpa_keys) — keys precomputed cùng lúc sort."""
+    s = sorted(records, key=lambda r: r["gpa"])
+    return s, [r["gpa"] for r in s]

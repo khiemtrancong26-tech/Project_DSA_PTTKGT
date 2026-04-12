@@ -16,7 +16,6 @@ class HashTable:
     def _hash(self, key: str) -> int:
         """
         Chuyển student_id (CCCD string) → chỉ số bucket.
-
         Dùng Polynomial Rolling Hash — đọc toàn bộ ký tự,
         không bỏ sót prefix → tránh clustered collision.
 

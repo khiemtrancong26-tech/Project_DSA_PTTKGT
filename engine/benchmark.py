@@ -99,12 +99,12 @@ def bench_s2a_linear(records: list, department: str, min_gpa: float, max_gpa: fl
     return {"algo": "Linear Scan", "ms": ms, "sort_ms": None, "match_count": len(matches), "matches": matches, "failed": False}
 
 
-def bench_s2a_binary(records: list, department: str, min_gpa: float, max_gpa: float) -> dict:
-    sort_start    = time.perf_counter()
-    sorted_by_gpa = sort_by_gpa(records)
-    sort_ms       = (time.perf_counter() - sort_start) * 1000
+def bench_s2a_binary(records, department, min_gpa, max_gpa):
+    sort_start              = time.perf_counter()
+    sorted_by_gpa, gpa_keys = sort_by_gpa(records)
+    sort_ms                 = (time.perf_counter() - sort_start) * 1000
 
-    ms, matches = _avg_ms(lambda: binary_filter_dept_gpa(sorted_by_gpa, department, min_gpa, max_gpa))
+    ms, matches = _avg_ms(lambda: binary_filter_dept_gpa(sorted_by_gpa, gpa_keys, department, min_gpa, max_gpa))
     return {"algo": "Binary Filter", "ms": ms, "sort_ms": sort_ms, "match_count": len(matches), "matches": matches, "failed": False}
 
 
@@ -121,14 +121,13 @@ def bench_s2b_linear(records: list, min_gpa: float, max_gpa: float) -> dict:
     return {"algo": "Linear Scan", "ms": ms, "sort_ms": None, "match_count": len(matches), "matches": matches, "failed": False}
 
 
-def bench_s2b_binary(records: list, min_gpa: float, max_gpa: float) -> dict:
-    sort_start    = time.perf_counter()
-    sorted_by_gpa = sort_by_gpa(records)
-    sort_ms       = (time.perf_counter() - sort_start) * 1000
+def bench_s2b_binary(records, min_gpa, max_gpa):
+    sort_start              = time.perf_counter()
+    sorted_by_gpa, gpa_keys = sort_by_gpa(records)
+    sort_ms                 = (time.perf_counter() - sort_start) * 1000
 
-    ms, matches = _avg_ms(lambda: binary_filter_gpa(sorted_by_gpa, min_gpa, max_gpa))
+    ms, matches = _avg_ms(lambda: binary_filter_gpa(sorted_by_gpa, gpa_keys, min_gpa, max_gpa))
     return {"algo": "Binary Filter", "ms": ms, "sort_ms": sort_ms, "match_count": len(matches), "matches": matches, "failed": False}
-
 
 # ══════════════════════════════════════════════════════════════════
 #  SCENARIO 3 — Tìm tên mờ
