@@ -27,7 +27,7 @@ from engine.search import (
 from engine.fuzzy_search import fuzzy_linear_search
 
 
-REPEAT = 10
+REPEAT = 50
 
 
 # ══════════════════════════════════════════════════════════════════

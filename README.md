@@ -9,7 +9,7 @@ So sánh hiệu năng **Hash Table, Linear Search, Binary Search** trên dataset
 - **Scenario 2B:** Lọc theo khoảng GPA thuần → Hash FAILED
 - **Scenario 3:** Tìm kiếm tên mờ (fuzzy, bỏ dấu tiếng Việt) → Hash FAILED hoàn toàn
 - Dataset: 1K / 5K / 10K records sinh viên giả lập
-- **Hai giao diện:** Terminal CLI (rich) và Web UI (FastAPI + HTML/JS)
+- **Giao diện:** Web UI chạy local (FastAPI + HTML/JS)
 
 ## Cài đặt
 
@@ -51,15 +51,7 @@ Tạo 3 file `students_1K.xlsx`, `students_5K.xlsx`, `students_10K.xlsx` trong t
 
 ---
 
-### Giao diện 1 — Terminal CLI
-```bash
-python main.py
-```
-Chọn dataset size → chọn scenario → chọn thuật toán → xem kết quả và thời gian thực thi.
-
----
-
-### Giao diện 2 — Web UI (chạy local)
+### Bước 2 — Khởi động Web UI
 ```bash
 python web.py
 ```
@@ -85,22 +77,18 @@ Project_DSA_PTTKGT/
 │   └── loader.py             # Đọc xlsx, build hash tables, sample_id
 ├── engine/
 │   ├── fuzzy_search.py       # Fuzzy search — NFKD normalize bỏ dấu tiếng Việt
-│   ├── benchmark.py          # Đo thời gian avg 20 lần (perf_counter)
+│   ├── benchmark.py          # Đo thời gian avg số lần (perf_counter)
 │   ├── search.py             # Linear Search, Binary Search, bisect filter, sort helpers
 │   ├── hash_table.py         # Base class — Polynomial Rolling Hash
 │   └── collision/
 │       ├── chaining.py       # Separate Chaining — 1 key → 1 value (dùng S1)
 │       ├── chaining_multi.py # Chaining Multi — 1 key → nhiều value (dùng S2A)
 │       └── open_addressing.py# Linear Probing (dùng S1)
-├── interface/
-│   ├── cli.py                # Giao diện dòng lệnh — luồng chính
-│   └── display.py            # Render kết quả ra terminal (rich)
 ├── web/
 │   ├── index.html            # Giao diện Web UI
 │   ├── script.js             # Logic frontend
 │   └── style.css             # Stylesheet
 ├── web.py                    # FastAPI server — serve Web UI + REST API
-├── main.py                   # Entry point CLI
 └── requirements.txt
 ```
 
@@ -120,6 +108,5 @@ Project_DSA_PTTKGT/
 
 - Python 3.11
 - pandas, openpyxl — đọc/ghi xlsx
-- rich — giao diện terminal
 - FastAPI, uvicorn — Web UI server
 - HTML / CSS / JavaScript — frontend

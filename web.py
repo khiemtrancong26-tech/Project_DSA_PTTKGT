@@ -50,7 +50,7 @@ def api_load_dataset(req: LoadDatasetReq):
         raise HTTPException(status_code=400, detail="Invalid dataset size")
 
     records = load_xlsx(DATASET_FILES[size])
-    ht_chain, ht_open, ht_dept = build_hash_tables(records, load_factor=0.5)
+    ht_chain, ht_open, ht_dept = build_hash_tables(records)
 
     db["records"]  = records
     db["ht_chain"] = ht_chain
