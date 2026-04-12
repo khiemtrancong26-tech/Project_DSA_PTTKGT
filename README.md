@@ -5,7 +5,7 @@ So sánh hiệu năng **Hash Table, Linear Search, Binary Search** trên dataset
 ## Tính năng
 
 - **Scenario 1:** Tra cứu sinh viên theo MSSV → Hash wins
-- **Scenario 2A:** Lọc theo GPA + mã khoa → Composite Hash (ChainingMulti) wins
+- **Scenario 2A:** Lọc theo GPA + mã khoa → Composite Hash (ChainingMulti & OpenAddrrMulti) wins
 - **Scenario 2B:** Lọc theo khoảng GPA thuần → Hash FAILED
 - **Scenario 3:** Tìm kiếm tên mờ (fuzzy, bỏ dấu tiếng Việt) → Hash FAILED hoàn toàn
 - Dataset: 1K / 5K / 10K records sinh viên giả lập
@@ -73,36 +73,25 @@ http://localhost:8000
 ```
 Project_DSA_PTTKGT/
 ├── data/
-│   ├── generator.py          # Sinh dataset giả (CCCD-based student_id)
-│   └── loader.py             # Đọc xlsx, build hash tables, sample_id
+│   ├── generator.py          # Sinh dataset giả — CCCD-based student_id
+│   └── loader.py             # Đọc xlsx, build hash tables, lấy sample_id
 ├── engine/
-│   ├── fuzzy_search.py       # Fuzzy search — NFKD normalize bỏ dấu tiếng Việt
-│   ├── benchmark.py          # Đo thời gian avg số lần (perf_counter)
-│   ├── search.py             # Linear Search, Binary Search, bisect filter, sort helpers
-│   ├── hash_table.py         # Base class — Polynomial Rolling Hash
+│   ├── hash_table.py         # Base class — Polynomial Rolling Hash (base=31)
+│   ├── search.py             # Linear / Binary Search + bisect filter
+│   ├── fuzzy_search.py       # NFKD normalize → substring match bỏ dấu
+│   ├── benchmark.py          # Đo avg 10 lần bằng perf_counter()
 │   └── collision/
-│       ├── chaining.py       # Separate Chaining — 1 key → 1 value (dùng S1)
-│       ├── chaining_multi.py # Chaining Multi — 1 key → nhiều value (dùng S2A)
-│       └── open_addressing.py# Linear Probing (dùng S1)
+│       ├── chaining.py              # Separate Chaining — 1 key → 1 value
+│       ├── chaining_multi.py        # Chaining Multi  — 1 key → list value
+│       ├── open_addressing.py       # Linear Probing  — 1 key → 1 value
+│       └── open_addressing_multi.py # Linear Probing — 1 key → list value
 ├── web/
-│   ├── index.html            # Giao diện Web UI
-│   ├── script.js             # Logic frontend
-│   └── style.css             # Stylesheet
-├── web.py                    # FastAPI server — serve Web UI + REST API
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+├── web.py                    # FastAPI server + REST API
 └── requirements.txt
 ```
-
-## Thiết kế engine
-
-| Module | Vai trò |
-|--------|---------|
-| `hash_table.py` | Base class — định nghĩa `_hash()` (Polynomial Rolling Hash), interface `insert`/`search` |
-| `chaining.py` | Separate Chaining — 1 key → 1 value, upsert khi key trùng |
-| `chaining_multi.py` | Chaining Multi — 1 key → list value, dùng cho Scenario 2A (key = department_code) |
-| `open_addressing.py` | Linear Probing — toàn bộ data trong 1 mảng phẳng, α < 1 |
-| `search.py` | Linear/Binary Search + bisect filter + sort helpers — thuần thuật toán, không đo thời gian |
-| `fuzzy_search.py` | NFKD decompose → bỏ combining diacritics → substring match không phân biệt dấu |
-| `benchmark.py` | Đo avg 20 lần bằng `perf_counter()`, cache department index theo `id(records)` |
 
 ## Công nghệ sử dụng
 
