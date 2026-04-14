@@ -5,10 +5,11 @@ from engine.hash_table import HashTable
 
 class OpenAddressingHashTable(HashTable):
     """
-    Hash Table giải quyết collision bằng Open Addressing — Linear Probing.
+    Hash Table giải quyết collision bằng Open Addressing.
 
-    Khi bucket bị chiếm → thử bucket kế tiếp: (idx + 1) % size.
-    Toàn bộ data nằm trong 1 mảng phẳng, không dùng list phụ.
+    Có 2 probe strategy — chỉnh comment để switch:
+        [A] Linear Probing  — bước nhảy cố định +1, đơn giản, dễ cluster
+        [B] Double Hashing  — bước nhảy theo h2(key), phân tán tốt hơn
 
     Complexity:
         insert : O(1) avg / O(n) worst
@@ -17,20 +18,46 @@ class OpenAddressingHashTable(HashTable):
 
     def __init__(self, size: int = 1009):
         super().__init__(size)
-        # Mỗi slot: None (trống) | (key, value)
         self.table = [None] * self.size
 
-    # ---- insert ----
+        # ── [A] Linear Probing
+        # ── không cần gì thêm ──
+
+        # ── [B] Double Hashing — tính STEP_PRIME động theo size ──
+        self.STEP_PRIME = self._find_step_prime(self.size)
+
+    # ══════════════════════════════════════════════════════════════
+    #  [B] Double Hashing helpers
+    # ══════════════════════════════════════════════════════════════
+
+    @staticmethod
+    def _find_step_prime(size: int) -> int:
+        """Số nguyên tố lớn nhất nhỏ hơn size — dùng làm base cho h2."""
+        n = size - 1
+        while n > 1:
+            if all(n % i != 0 for i in range(2, int(n**0.5) + 1)):
+                return n
+            n -= 1
+        return 1
+
+    def _hash2(self, key: str) -> int:
+        """step = STEP_PRIME - (sum_ord % STEP_PRIME) → luôn ∈ [1, STEP_PRIME]."""
+        raw = sum(ord(c) for c in key)
+        return self.STEP_PRIME - (raw % self.STEP_PRIME)
+
+    # ══════════════════════════════════════════════════════════════
+    #  insert
+    # ══════════════════════════════════════════════════════════════
 
     def insert(self, key: str, value: dict):
-        """
-        Thêm (key, value) vào bảng.
-        Nếu key đã tồn tại → update value.
-        """
         if self.count >= self.size:
             raise OverflowError("Hash table đầy — không thể insert thêm.")
 
         idx = self._hash(key)
+
+        # ── Chọn 1 trong 2 dòng dưới ──
+        #step = self._hash2(key)   # [B] Double Hashing
+        step = 1                # [A] Linear Probing
 
         for _ in range(self.size):
             slot = self.table[idx]
@@ -41,24 +68,23 @@ class OpenAddressingHashTable(HashTable):
                 return
 
             if slot[0] == key:
-                # Key đã tồn tại → update in-place
-                self.table[idx] = (key, value)
+                self.table[idx] = (key, value)   # update in-place
                 return
 
-            idx = (idx + 1) % self.size   # linear probe
+            idx = (idx + step) % self.size
 
         raise OverflowError("Hash table đầy — không thể insert thêm.")
 
-    # ---- search ----
+    # ══════════════════════════════════════════════════════════════
+    #  search
+    # ══════════════════════════════════════════════════════════════
 
     def search(self, key: str):
-        """
-        Tìm kiếm theo key.
-        Trả về value nếu tìm thấy, None nếu không có.
-
-        Probe dừng khi gặp None (slot chưa từng bị dùng).
-        """
         idx = self._hash(key)
+
+        # ── Chọn 1 trong 2 dòng dưới ──
+        #step = self._hash2(key)   # [B] Double Hashing
+        step = 1                # [A] Linear Probing
 
         for _ in range(self.size):
             slot = self.table[idx]
@@ -67,9 +93,8 @@ class OpenAddressingHashTable(HashTable):
                 return None   # chắc chắn không có — dừng probe
 
             if slot[0] == key:
-                return slot[1]   # tìm thấy
+                return slot[1]
 
-            idx = (idx + 1) % self.size
+            idx = (idx + step) % self.size
 
         return None   # đã probe hết vòng
-
