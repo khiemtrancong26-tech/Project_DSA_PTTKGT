@@ -18,15 +18,12 @@ class HashTable:
         Chuyển student_id (CCCD string) → chỉ số bucket.
         Dùng Polynomial Rolling Hash — đọc toàn bộ ký tự,
         không bỏ sót prefix → tránh clustered collision.
-
-        Không dùng hash() built-in vì Python 3.3+ thêm random seed
-        mỗi lần chạy → kết quả không deterministic → benchmark sai.
         """
     def _hash(self, key: str) -> int:
         h = 0
         for char in key:
-            #h = (h + ord(char)) % self.size          # weak hash — bật dòng này cho S1 demo
-            h = (h * 31 + ord(char)) % self.size     # strong hash — bật dòng này cho production
+            #h = (h + ord(char)) % self.size          # weak hash
+            h = (h * 31 + ord(char)) % self.size     # strong hash
         return h
 
     # ---- Interface bắt buộc — subclass PHẢI override ----
