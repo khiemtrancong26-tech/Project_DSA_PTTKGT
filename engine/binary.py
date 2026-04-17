@@ -56,6 +56,16 @@ def sort_by_gpa(records: list) -> tuple:
     s = sorted(records, key=lambda r: r["gpa"])
     return s, [r["gpa"] for r in s]
 
+def sort_by_dept_gpa(records: list) -> tuple:
+    """
+    Sort theo (department_code, gpa) — composite key.
+    Cho phép binary search 2 chiều: khóa dept trước, gpa sau.
+    Trả về (sorted_records, composite_keys) — keys precomputed.
+    """
+    s = sorted(records, key=lambda r: (r["department_code"], r["gpa"]))
+    keys = [(r["department_code"], r["gpa"]) for r in s]
+    return s, keys
+
 
 # ══════════════════════════════════════════════════════════════════
 #  S1 — Tìm 1 record theo student_id
@@ -83,11 +93,23 @@ def binary_search(sorted_records: list, target_id: str):
 #  S2 — Lọc theo khoảng GPA
 # ══════════════════════════════════════════════════════════════════
 
-def binary_filter_dept_gpa(sorted_by_gpa: list, gpa_keys: list, department: str, min_gpa: float, max_gpa: float) -> list:
-    """Bisect lấy range GPA, lọc thêm theo department. Complexity: O(log n + k)."""
-    lo = _bisect_left(gpa_keys, min_gpa)
-    hi = _bisect_right(gpa_keys, max_gpa)
-    return [r for r in sorted_by_gpa[lo:hi] if r["department_code"] == department]
+def binary_filter_dept_gpa(sorted_records: list, composite_keys: list,
+                           department: str, min_gpa: float, max_gpa: float) -> list:
+    """
+    Bisect trên composite key (dept, gpa).
+    Không có bước linear — slice trả ra đúng kết quả ngay.
+
+    Tại sao đúng:
+        ("CNTT", 3.0) < ("CNTT", 4.0) < ("HTTT", 0.0)
+        → bisect_left tìm ("CNTT", min_gpa) → đầu range
+        → bisect_right tìm ("CNTT", max_gpa) → cuối range
+        → mọi record ngoài khoảng đều bị loại bởi tuple comparison
+
+    Complexity: O(log n + k) — k là số kết quả thực sự.
+    """
+    lo = _bisect_left(composite_keys, (department, min_gpa))
+    hi = _bisect_right(composite_keys, (department, max_gpa))
+    return sorted_records[lo:hi]
 
 
 def binary_filter_gpa(sorted_by_gpa: list, gpa_keys: list, min_gpa: float, max_gpa: float) -> list:

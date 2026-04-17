@@ -22,21 +22,12 @@ class HashTable:
         Không dùng hash() built-in vì Python 3.3+ thêm random seed
         mỗi lần chạy → kết quả không deterministic → benchmark sai.
         """
-        #Hash tối ưu:
-        """
+    def _hash(self, key: str) -> int:
         h = 0
         for char in key:
-            h = (h * 31 + ord(char)) % self.size
+            #h = (h + ord(char)) % self.size          # weak hash — bật dòng này cho S1 demo
+            h = (h * 31 + ord(char)) % self.size     # strong hash — bật dòng này cho production
         return h
-        """
-
-        #Hash yếu:
-        #"""
-        h = 0
-        for char in key:
-            h += ord(char)
-        return h % self.size
-        #"""
 
     # ---- Interface bắt buộc — subclass PHẢI override ----
 

@@ -24,6 +24,7 @@ from engine.binary import (
     binary_filter_gpa,
     sort_by_id,
     sort_by_gpa,
+    sort_by_dept_gpa,
 )
 from engine.fuzzy_search import fuzzy_linear_search
 
@@ -82,10 +83,13 @@ def bench_s2a_linear(records: list, department: str, min_gpa: float, max_gpa: fl
 
 
 def bench_s2a_binary(records: list, department: str, min_gpa: float, max_gpa: float) -> dict:
-    sort_ms, (sorted_by_gpa, gpa_keys) = _once_ms(lambda: sort_by_gpa(records))
+    sort_ms, (sorted_records, composite_keys) = _once_ms(lambda: sort_by_dept_gpa(records))
 
-    ms, matches = _avg_ms(lambda: binary_filter_dept_gpa(sorted_by_gpa, gpa_keys, department, min_gpa, max_gpa))
-    return {"algo": "Binary Filter", "ms": ms, "sort_ms": sort_ms, "match_count": len(matches), "matches": matches, "failed": False}
+    ms, matches = _avg_ms(
+        lambda: binary_filter_dept_gpa(sorted_records, composite_keys, department, min_gpa, max_gpa)
+    )
+    return {"algo": "Binary Filter", "ms": ms, "sort_ms": sort_ms,
+            "match_count": len(matches), "matches": matches, "failed": False}
 
 
 # ══════════════════════════════════════════════════════════════════
