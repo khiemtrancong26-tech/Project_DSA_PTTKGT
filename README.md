@@ -4,10 +4,10 @@ So sánh hiệu năng **Hash Table, Linear Search, Binary Search** trên dataset
 
 ## Tính năng
 
-- **Scenario 1:** Tra cứu sinh viên theo MSSV → Hash wins
-- **Scenario 2A:** Lọc theo GPA + mã khoa → Composite Hash (ChainingMulti & OpenAddrrMulti) wins
-- **Scenario 2B:** Lọc theo khoảng GPA thuần → Hash FAILED
-- **Scenario 3:** Tìm kiếm tên mờ (fuzzy, bỏ dấu tiếng Việt) → Hash FAILED hoàn toàn
+- **Scenario 1:** Tra cứu sinh viên theo MSSV
+- **Scenario 2A:** Lọc theo GPA + mã khoa
+- **Scenario 2B:** Lọc theo khoảng GPA thuần
+- **Scenario 3:** Tìm kiếm tên mờ (fuzzy, bỏ dấu tiếng Việt)
 - Dataset: 1K / 5K / 10K records sinh viên giả lập
 - **Giao diện:** Web UI chạy local (FastAPI + HTML/JS)
 
