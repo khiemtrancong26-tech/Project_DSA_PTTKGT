@@ -1,3 +1,5 @@
+# engine/inverted_index.py
+
 from engine.collision.chaining_multi import ChainingMultiHashTable
 from engine.fuzzy_search import normalize
 

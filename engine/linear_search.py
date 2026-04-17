@@ -1,4 +1,4 @@
-# engine/linear.py
+# engine/linear_search.py
 """
 Các thuật toán Linear — primitive rời rạc, thuần tính toán.
 Không đo thời gian, không gọi nhau theo scenario.

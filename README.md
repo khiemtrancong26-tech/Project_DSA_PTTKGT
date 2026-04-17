@@ -73,23 +73,26 @@ http://localhost:8000
 ```
 Project_DSA_PTTKGT/
 ├── data/
-│   ├── generator.py          # Sinh dataset giả — CCCD-based student_id
-│   └── loader.py             # Đọc xlsx, build hash tables, lấy sample_id
+│   ├── generator.py               # Sinh dataset giả — CCCD-based student_id
+│   └── loader.py                  # Đọc xlsx, build hash tables
 ├── engine/
-│   ├── hash_table.py         # Base class — Polynomial Rolling Hash (base=31)
-│   ├── search.py             # Linear / Binary Search + bisect filter
-│   ├── fuzzy_search.py       # NFKD normalize → substring match bỏ dấu
-│   ├── benchmark.py          # Đo avg 10 lần bằng perf_counter()
-│   └── collision/
-│       ├── chaining.py              # Separate Chaining — 1 key → 1 value
-│       ├── chaining_multi.py        # Chaining Multi  — 1 key → list value
-│       ├── open_addressing.py       # Linear Probing  — 1 key → 1 value
-│       └── open_addressing_multi.py # Linear Probing — 1 key → list value
+│   ├── linear_search.py           # Linear Search — O(n) duyệt tuần tự
+│   ├── binary_search.py           # Binary Search + bisect helpers — O(log n)
+│   ├── fuzzy_search.py            # NFKD normalize → substring match bỏ dấu
+│   ├── inverted_index.py          # Inverted Index — token → danh sách record
+│   ├── benchmark.py               # Đo avg 10 lần bằng perf_counter()
+│   ├── scenario.py                # Ráp logic đầy đủ từng scenario, gọi benchmark
+│   ├── hash_table.py              # Base class — Polynomial Rolling Hash (base=31)
+│   └── collision/                 # ← Các lớp con kế thừa trực tiếp từ hash_table.py
+│       ├── chaining.py            # Separate Chaining — 1 key → 1 value
+│       ├── chaining_multi.py      # Chaining Multi   — 1 key → list value
+│       ├── open_addressing.py     # Double Hashing   — 1 key → 1 value
+│       └── open_addressing_multi.py  # Double Hashing — 1 key → list value
 ├── web/
 │   ├── index.html
 │   ├── script.js
 │   └── style.css
-├── web.py                    # FastAPI server + REST API
+├── web.py                         # FastAPI server + REST API
 └── requirements.txt
 ```
 

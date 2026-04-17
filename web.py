@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from data.loader import load_xlsx, build_hash_tables, sample_id
+from data.loader import load_xlsx, build_hash_tables
 from engine.scenario import (
     bench_s1_chain, bench_s1_open, bench_s1_linear, bench_s1_binary,
     bench_s2a_chain, bench_s2a_open, bench_s2a_linear, bench_s2a_binary,
@@ -66,7 +66,7 @@ def api_load_dataset(req: LoadDatasetReq):
     db["ht_open_s2b"]  = ht_open_s2b
     db["inv_index"]    = inv_index
 
-    suggested = sample_id(records) if records else "SV001"
+    suggested = records[len(records) * 3 // 4]["student_id"] if records else "SV001"
     return {"count": len(records), "suggested_id": suggested}
 
 

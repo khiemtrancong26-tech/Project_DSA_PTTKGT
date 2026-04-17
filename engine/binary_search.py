@@ -1,4 +1,4 @@
-# engine/binary.py
+# engine/binary_search.py
 """
 Các thuật toán Binary Search — primitive rời rạc, thuần tính toán.
 Bao gồm bisect helpers và sort helpers phục vụ binary search.

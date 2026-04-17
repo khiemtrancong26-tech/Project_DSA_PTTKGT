@@ -118,12 +118,3 @@ def _next_prime(n: int) -> int:
     while not is_prime(n):
         n += 1
     return n
-
-
-# ══════════════════════════════════════════════════════════════════
-#  3. Tiện ích benchmark (lấy student_id default)
-# ══════════════════════════════════════════════════════════════════
-
-def sample_id(records: list, index: int = 500) -> str:
-    """Lấy student_id tại vị trí index = 500"""
-    return records[min(index, len(records) - 1)]["student_id"]
